@@ -21,7 +21,7 @@
     Get-Help about_OHTools
 
 
-## Examples
+### Examples
 
 ![Get Comp info](/Media/Get-OHComputerInfo.png)
 
