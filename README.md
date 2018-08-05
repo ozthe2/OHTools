@@ -22,4 +22,11 @@
 
 
 ##Examples
-![Get-OHComputerInfo](https://github.com/ozthe2/OHTools/blob/master/Media/Get-OHComputerInfo.png)
+
+![Get Comp info](/Media/Get-OHComputerInfo.png)
+
+
+
+
+![Get Comp info all](/Media/Get-OHComputerInfoDetail.png)
+
