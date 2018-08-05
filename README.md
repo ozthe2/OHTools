@@ -19,3 +19,7 @@
 ### Get help
     Get-Help Get-OHComputerInfo -Full
     Get-Help about_OHTools
+
+
+##Examples
+![Get-OHComputerInfo](https://github.com/ozthe2/OHTools/blob/master/Media/Get-OHComputerInfo.png)
