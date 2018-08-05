@@ -3,23 +3,21 @@
 .SYNOPSIS
     Gets computer information such as Network details and Operating system installed
 .DESCRIPTION
-    By default, this will pull basic but fundamental info from the computer such as OS, Network details eg IP \ Subnet etc, Virtual or not etc.  By adding the -Detailed switch, more information will be gathered.
+    By default, this will pull basic but fundamental info from the computer such as OS, Network details eg IP \ Subnet etc, Virtual or not etc.
     Use the -verbose switch to see which computers failed the connection test.
 .PARAMETER ComputerName
-    The name of the computer that you wish to probe
-.PARAMETER Detailed
-    When you use this switch, additional info will be obtained: Disk, BIOS and Processor information
+    The name of the computer that you wish to query.
 .EXAMPLE
-    Get-CFComputerInfo -ComputerName MyComputer -Detailed
-    The detailed computer information of 'MyComputer' will be displayed on screen.
+    Get-CFComputerInfo -ComputerName MyComputer
+    The computer system information of 'MyComputer' will be displayed on screen.
 .EXAMPLE
     'computer1','computer2' | Get-CFComputerInfo
-    The computer information of 'Computer1' and 'Computer2' will be displayed on screem.  It will not contain BIOS, Disk or CPU info as the -Detailed switch has not been used.
+    The computer information of 'Computer1' and 'Computer2' will be displayed on screen.
 .EXAMPLE
-    (get-adcomputer -filter * -SearchBase 'ou=servers,ou=MyOU,dc=mydomain,dc=local').name  | Get-CFComputerInfo -Detailed | export-csv C:\Output.csv -NoTypeInformation
+    (get-adcomputer -filter * -SearchBase 'ou=servers,ou=MyOU,dc=mydomain,dc=local').name  | Get-CFComputerInfo | export-csv C:\Output.csv -NoTypeInformation
     The computer objects in the OU obtained by 'Get-ADComputer' will have all available computer information output to a CSV file.
 .EXAMPLE
-    servers.txt | Get-CFComputerinfo -detailed
+    servers.txt | Get-CFComputerinfo
     The computernames contained in Servers.txt will be used as the input of the command and all available computer information will be displayed.
 #>
     [CmdletBinding()]
@@ -27,8 +25,7 @@
         [Parameter(
         ValueFromPipelineByPropertyName=$true,
         ValueFromPipeline=$true)]
-        [string[]]$ComputerName = $env:COMPUTERNAME,
-        [switch]$Detailed
+        [string[]]$ComputerName = $env:COMPUTERNAME
     )
 
     begin {}
@@ -114,34 +111,34 @@
 
                 }# foreach $network
 
-                if ($Detailed) {
-                    #Disk info
-                    Foreach ($Disk in $diskinfo) {
-                        $size = ([math]::round(($disk.size/1GB),2))
-                        $free = ([math]::round(($disk.freespace/1GB),2))
+                
+                #Disk info
+                Foreach ($Disk in $diskinfo) {
+                    $size = ([math]::round(($disk.size/1GB),2))
+                    $free = ([math]::round(($disk.freespace/1GB),2))
 
-                        $obj | Add-Member -MemberType NoteProperty -Name "DiskSize($($disk.deviceid))"  -value "$size GB"
-                        $obj | Add-Member -MemberType NoteProperty -Name "DiskFreespace($($disk.deviceid))"  -value "$free GB"
-                    }
+                    $obj | Add-Member -MemberType NoteProperty -Name "DiskSize($($disk.deviceid))"  -value "$size GB"
+                    $obj | Add-Member -MemberType NoteProperty -Name "DiskFreespace($($disk.deviceid))"  -value "$free GB"
+                }
 
-                    #Bios info
-                    $obj | Add-Member -MemberType NoteProperty -Name "BIOSMake"  -value (@($bios.biosversion) -join ',')
-                    $obj | Add-Member -MemberType NoteProperty -Name "BIOSVerion"  -value "$($bios.SMBIOSBIOSVersion).$($bios.SMBIOSMajorVersion).$($bios.SMBIOSMinorVersion)"
+                #Bios info
+                $obj | Add-Member -MemberType NoteProperty -Name "BIOSMake"  -value (@($bios.biosversion) -join ',')
+                $obj | Add-Member -MemberType NoteProperty -Name "BIOSVerion"  -value "$($bios.SMBIOSBIOSVersion).$($bios.SMBIOSMajorVersion).$($bios.SMBIOSMinorVersion)"
 
-                    #Processor info
-                    foreach ($Processor in $proc) {
-                        $obj | Add-Member -MemberType NoteProperty -Name "ProcessorID($($processor.deviceID))"  -value $Processor.DeviceID
-                        $obj | Add-Member -MemberType NoteProperty -Name "ProcessorCaption($($processor.deviceID))"  -value $Processor.Caption
-                        $obj | Add-Member -MemberType NoteProperty -Name "ProcessorName($($processor.deviceID))"  -value $Processor.Name
-                        $obj | Add-Member -MemberType NoteProperty -Name "ProcessorSpeed($($processor.deviceID))"  -value $Processor.MaxClockSpeed
-                        $obj | Add-Member -MemberType NoteProperty -Name "ProcessorCores($($processor.deviceID))"  -value $Processor.NumberOfCores
-                        $obj | Add-Member -MemberType NoteProperty -Name "ProcessorLogicalProcessors($($processor.deviceID))"  -value $Processor.NumberOfLogicalProcessors
-                    }
-                }#if $detailed
+                #Processor info
+                foreach ($Processor in $proc) {
+                    $obj | Add-Member -MemberType NoteProperty -Name "ProcessorID($($processor.deviceID))"  -value $Processor.DeviceID
+                    $obj | Add-Member -MemberType NoteProperty -Name "ProcessorCaption($($processor.deviceID))"  -value $Processor.Caption
+                    $obj | Add-Member -MemberType NoteProperty -Name "ProcessorName($($processor.deviceID))"  -value $Processor.Name
+                    $obj | Add-Member -MemberType NoteProperty -Name "ProcessorSpeed($($processor.deviceID))"  -value $Processor.MaxClockSpeed
+                    $obj | Add-Member -MemberType NoteProperty -Name "ProcessorCores($($processor.deviceID))"  -value $Processor.NumberOfCores
+                    $obj | Add-Member -MemberType NoteProperty -Name "ProcessorLogicalProcessors($($processor.deviceID))"  -value $Processor.NumberOfLogicalProcessors
+                }
+                
 
-                $obj.psobject.typenames.insert(0,'OH.OHTools.ComputerInfo')
+                $obj.psobject.TypeNames.Insert(0,'OH.OHTools.ComputerInfo')
 
-                $obj
+                write-output $obj
 
 
             }#if $Continue
