@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/aonepjox78v7xhff?svg=true)](https://ci.appveyor.com/project/ozthe2/ohtools)
+
 # OHTools
 
 # One time setup
