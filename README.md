@@ -8,7 +8,7 @@
     # Extract the OHTools folder to a module path (e.g. $env:USERPROFILE\Documents\WindowsPowerShell\Modules\)
 
     #Simple alternative, if you have PowerShell 5, or the PowerShellGet module:
-    (This is coming soon - does not work yet!)    Install-Module OHTools
+    Install-Module OHTools
 
 ### Import the module.
     Import-Module OHTools    #Alternatively, Import-Module \\Path\To\OHTools
