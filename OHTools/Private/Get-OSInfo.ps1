@@ -6,6 +6,8 @@
 
     [PSCustomObject]@{        
         OS               = $OSInfo.Caption
+        OSBuild          = $OSInfo.BuildNumber
+        OSSPVersion      = $OSInfo.ServicePackMajorVersion
         Architecture     = $OSinfo.OSArchitecture
         InstallDate      = $OSInfo.InstallDate
         SystemDrive      = $OSInfo.SystemDrive
