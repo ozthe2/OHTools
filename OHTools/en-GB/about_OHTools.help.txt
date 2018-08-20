@@ -8,5 +8,5 @@ LONG DESCRIPTION
     OHTools will enable you to query computers for detailed system information.
 
 DETAILED DESCRIPTION
-    THis is an ongoing module that will have various computer query 'Tools' added to it as time goes by.
+    This is an ongoing module that will have various computer query 'Tools' added to it as time goes by.
 Currently, it contains 'Get-OHComputerInfo' which will retrieve computer system information such as Operating System, Multiple NIC information, Multiple Disk drive info etc.

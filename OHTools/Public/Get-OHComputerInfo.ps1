@@ -1,30 +1,33 @@
 ﻿Function Get-OHComputerInfo {
-<#
-.SYNOPSIS
-    Gets computer information such as Network details and Operating system installed
-.DESCRIPTION
-    By default, this will pull basic but fundamental info from the computer such as OS, Network details eg IP \ Subnet etc, Virtual or not etc.
-    Use the -verbose switch to see which computers failed the connection test.
-.PARAMETER ComputerName
-    The name of the computer that you wish to query.
-.EXAMPLE
-    Get-CFComputerInfo -ComputerName MyComputer
-    The computer system information of 'MyComputer' will be displayed on screen.
-.EXAMPLE
-    'computer1','computer2' | Get-CFComputerInfo
-    The computer information of 'Computer1' and 'Computer2' will be displayed on screen.
-.EXAMPLE
-    (get-adcomputer -filter * -SearchBase 'ou=servers,ou=MyOU,dc=mydomain,dc=local').name  | Get-CFComputerInfo | export-csv C:\Output.csv -NoTypeInformation
-    The computer objects in the OU obtained by 'Get-ADComputer' will have all available computer information output to a CSV file.
-.EXAMPLE
-    servers.txt | Get-CFComputerinfo
-    The computernames contained in Servers.txt will be used as the input of the command and all available computer information will be displayed.
-#>
+    <#
+    .SYNOPSIS
+        Gets computer information such as Network details and Operating system installed
+    .DESCRIPTION
+        By default, this will pull basic but fundamental info from the computer such as OS, Network details eg IP \ Subnet etc, Virtual or not etc.
+        Use the -verbose switch to see which computers failed the connection test.
+    .PARAMETER ComputerName
+        The name of the computer that you wish to query.
+    .EXAMPLE
+        Get-OHComputerInfo -ComputerName MyComputer
+        The computer system information of 'MyComputer' will be displayed on screen.
+    .EXAMPLE
+        'computer1','computer2' | Get-OHComputerInfo
+        The computer information of 'Computer1' and 'Computer2' will be displayed on screen.
+    .EXAMPLE
+        (get-adcomputer -filter * -SearchBase 'ou=servers,ou=MyOU,dc=mydomain,dc=local').name  | Get-OHComputerInfo | export-csv C:\Output.csv -NoTypeInformation
+        The computer objects in the OU obtained by 'Get-ADComputer' will have all available computer information output to a CSV file.
+    .EXAMPLE
+        servers.txt | Get-OHComputerInfo
+        The computer names contained in Servers.txt will be used as the input of the command and all available computer information will be displayed.
+    .EXAMPLE
+        Get-OHComputerInfo | out-file  ('{0}{1}{2}' -f "C:\temp\Output-", (get-date -Format MMMyyy), ".log")
+        The local computer will be queried, and the result written to a dated file named 'Output-MonthYear.log'
+        #>
     [CmdletBinding()]
     param(
         [Parameter(
-        ValueFromPipelineByPropertyName=$true,
-        ValueFromPipeline=$true)]
+            ValueFromPipelineByPropertyName = $true,
+            ValueFromPipeline = $true)]
         [string[]]$ComputerName = $env:COMPUTERNAME
     )
 
@@ -32,118 +35,109 @@
 
     process {
         foreach ($Computer in $ComputerName) {
-            try {
-                $Continue = $true
-                Write-Verbose "Trying computer: $Computer."
-                #Let's try a generic wmi call to the computer to ensure that we can connect
-                $OS = Get-CimInstance -Class Win32_OperatingSystem -ComputerName $Computer -ErrorAction stop
+            Write-Verbose "Trying to connect to computer: $Computer."
+            if (!(Test-ComputerConnection -Computer $Computer)) {
+                write-warning "Unable to connect to $computer`n"
+                continue
+            }
 
-	        } catch {
-		        $Continue = $false
-                Write-Verbose "$Computer failed connection."
-                #Write-Error $_.Exception.Message
-	        }
+            write-verbose "Getting the information!"
+            $CompSysInfo = Get-CompSysInfo -Computer $Computer
+            $OSInfo = Get-OSInfo -Computer $Computer
+            $BiosInfo = Get-BIOSInfo -Computer $Computer
+            $ProcInfo = Get-ProcInfo -Computer $Computer
+            $DiskInfo = Get-DiskInfo -Computer $Computer
+            $NICInfo = Get-NICInfo -Computer $Computer
 
-            #If the WMI call succeeded, lets do it...
-            if ($Continue) {
-                Write-Verbose "Connection to computer: $Computer successful - Trying next WMI calls."
-                $net = Get-CimInstance Win32_NetworkAdapterConfiguration -ComputerName $Computer
-                $bios = Get-CimInstance Win32_Bios -ComputerName $Computer
-                $comp = Get-CimInstance Win32_ComputerSystem -ComputerName $Computer
-                $proc = Get-CimInstance Win32_processor -ComputerName $Computer
-                $diskinfo = Get-CimInstance Win32_LogicalDisk -ComputerName $Computer -filter "drivetype = 3"
+            #Create an object
+            $Obj = [PSCustomObject]@{
+                ComputerName       = $CompSysInfo.ComputerName                
+                DomainRole         = $CompSysInfo.DomainRole
+                Manufacturer       = $CompSysInfo.Manufacturer
+                Model              = $CompSysInfo.Model
+                Memory             = $CompSysInfo.Memory
+                OS                 = $OSInfo.OS
+                OSBuild            = $OSInfo.OSBuild
+                OSSPVersion        = $OSInfo.OSSPVersion
+                OSArchitecture     = $OSinfo.Architecture
+                OSInstallDate      = $OSInfo.InstallDate
+                OSSystemDrive      = $OSInfo.SystemDrive
+                OSWindowsDirectory = $OSInfo.WindowsDirectory
+                OSSystemDirectory  = $OSInfo.SystemDirectory
+                OSLocale           = $OSInfo.Locale
+                OSLanguage         = $OSInfo.OSLanguage
+                BiosManufacturer   = $BiosInfo.Manufacturer
+                BiosSMVersion      = $BiosInfo.SMVersion
+                BIOSVersion        = $BiosInfo.BIOSVersion               
+            } 
 
-                #Create custom object
-                $Obj = [pscustomobject]@{
-                            'Computername'   = $Computer.toupper()
-                            'OSVersion'     = $os.caption
-                            'OSBuild'        = $os.buildNumber
-                            'SPVersion'      = $os.ServicePackMajorVersion
-                            'OSArchitecture' = $os.osarchitecture
-                            'Manufacturer'   = $comp.manufacturer
-                            'Model'          = $comp.model
-                        }#Custom object
+            Foreach ($Processor in $ProcInfo) {
+                $obj | Add-Member -MemberType NoteProperty -Name "ProcID($($processor.deviceID))"  -value $Processor.DeviceID
+                $obj | Add-Member -MemberType NoteProperty -Name "ProcManufacturer($($processor.deviceID))"  -value $Processor.Manufacturer
+                $obj | Add-Member -MemberType NoteProperty -Name "ProcCaption($($processor.deviceID))"  -value $Processor.Caption
+                $obj | Add-Member -MemberType NoteProperty -Name "ProcName($($processor.deviceID))"  -value $Processor.Name
+                $obj | Add-Member -MemberType NoteProperty -Name "ProcSpeed($($processor.deviceID))"  -value $Processor.MaxClockSpeed
+                $obj | Add-Member -MemberType NoteProperty -Name "ProcCores($($processor.deviceID))"  -value $Processor.Cores
+                $obj | Add-Member -MemberType NoteProperty -Name "ProcLogicalProcessors($($processor.deviceID))"  -value $Processor.LogicalProcessors
+            }
+            
+            Foreach ($Disk in $DiskInfo) {
+                $obj | Add-Member -MemberType NoteProperty -Name "DriveLetter($($disk.DriveLetter))" -value $disk.DriveLetter    
+                $obj | Add-Member -MemberType NoteProperty -Name "VolumeName($($disk.DriveLetter))"  -value $disk.volumename
+                $obj | Add-Member -MemberType NoteProperty -Name "DiskSize($($disk.DriveLetter))"  -value $disk.Size
+                $obj | Add-Member -MemberType NoteProperty -Name "DiskFreespace($($disk.DriveLetter))"  -value $disk.freespace
+            }
+            
+            foreach ($Network in $NICInfo) {
+                if ($null -eq $network.ip) {
+                    continue
+                }
+                else {
+                    $obj | Add-Member -MemberType NoteProperty -Name "IPAddressIndex($($network.index[0]))"  -value $($Network.index[0])
+                    $obj | Add-Member -MemberType NoteProperty -Name "IPAddress($($network.index[0]))"  -value $($Network.ip[0])
+                }                  
 
-                #Get network info and add to the custom object
-                foreach ($Network in $net) {
-                    if ($null -eq $network.ipaddress) {
-                        continue
-                    } else {
-                        $obj | Add-Member -MemberType NoteProperty -Name "IPAddressIndex($($network.index[0]))"  -value $($Network.index[0])
-                        $obj | Add-Member -MemberType NoteProperty -Name "IPAddress($($network.index[0]))"  -value $($Network.ipaddress[0])
-                    }
-
-                   # if ($network.ipaddress -eq $NULL) {
-                   #     continue
-                   # } else {
-                   #     $obj | Add-Member -MemberType NoteProperty -Name "IPAddress($($network.index[0]))"  -value $($Network.ipaddress[0])
-                   # }
-
-                    if ($NULL -eq $network.ipsubnet) {
-                        $obj | Add-Member -MemberType NoteProperty -Name "Subnet($($network.index[0]))"  -value ""
-                    } else {
-                        $obj | Add-Member -MemberType NoteProperty -Name "Subnet($($network.index[0]))"  -value $($Network.ipsubnet[0])
-                    }
-
-                    if ($Null -eq $network.defaultipgateway) {
-                        $obj | Add-Member -MemberType NoteProperty -Name "Gateway($($network.index[0]))"  -value ""
-                    } else {
-                        $obj | Add-Member -MemberType NoteProperty -Name "Gateway($($network.index[0]))"  -value $($Network.defaultipgateway[0])
-                    }
-
-                    if ($NULL -eq $network.dhcpenabled) {
-                        $obj | Add-Member -MemberType NoteProperty -Name "DHCPEnabled($($network.index[0]))"  -value "False"
-                    } else {
-                        $obj | Add-Member -MemberType NoteProperty -Name "DHCPEnabled($($network.index[0]))"  -value $($Network.dhcpenabled[0])
-                    }
-
-                    if ($NULL -eq $network.dnsserversearchorder) {
-                        $obj | Add-Member -MemberType NoteProperty -Name "DNS($($network.index[0]))"  -value ""
-                    } else {
-                        $obj | Add-Member -MemberType NoteProperty -Name "DNS($($network.index[0]))"  -value (@($Network.dnsserversearchorder) -join ',')
-                    }
-
-                    if ($NULL -eq $network.MACAddress) {
-                        $obj | Add-Member -MemberType NoteProperty -Name "MAC($($network.index[0]))"  -value ""
-                    } else {
-                        $obj | Add-Member -MemberType NoteProperty -Name "MAC($($network.index[0]))"  -value $($Network.MACAddress)
-                    }
-
-                }# foreach $network
-
-                
-                #Disk info
-                Foreach ($Disk in $diskinfo) {
-                    $size = ([math]::round(($disk.size/1GB),2))
-                    $free = ([math]::round(($disk.freespace/1GB),2))
-
-                    $obj | Add-Member -MemberType NoteProperty -Name "DiskSize($($disk.deviceid))"  -value "$size GB"
-                    $obj | Add-Member -MemberType NoteProperty -Name "DiskFreespace($($disk.deviceid))"  -value "$free GB"
+                if ($NULL -eq $network.subnet) {
+                    $obj | Add-Member -MemberType NoteProperty -Name "Subnet($($network.index[0]))"  -value ""
+                }
+                else {
+                    $obj | Add-Member -MemberType NoteProperty -Name "Subnet($($network.index[0]))"  -value $($Network.subnet[0])
                 }
 
-                #Bios info
-                $obj | Add-Member -MemberType NoteProperty -Name "BIOSMake"  -value (@($bios.biosversion) -join ',')
-                $obj | Add-Member -MemberType NoteProperty -Name "BIOSVerion"  -value "$($bios.SMBIOSBIOSVersion).$($bios.SMBIOSMajorVersion).$($bios.SMBIOSMinorVersion)"
-
-                #Processor info
-                foreach ($Processor in $proc) {
-                    $obj | Add-Member -MemberType NoteProperty -Name "ProcessorID($($processor.deviceID))"  -value $Processor.DeviceID
-                    $obj | Add-Member -MemberType NoteProperty -Name "ProcessorCaption($($processor.deviceID))"  -value $Processor.Caption
-                    $obj | Add-Member -MemberType NoteProperty -Name "ProcessorName($($processor.deviceID))"  -value $Processor.Name
-                    $obj | Add-Member -MemberType NoteProperty -Name "ProcessorSpeed($($processor.deviceID))"  -value $Processor.MaxClockSpeed
-                    $obj | Add-Member -MemberType NoteProperty -Name "ProcessorCores($($processor.deviceID))"  -value $Processor.NumberOfCores
-                    $obj | Add-Member -MemberType NoteProperty -Name "ProcessorLogicalProcessors($($processor.deviceID))"  -value $Processor.NumberOfLogicalProcessors
+                if ($Null -eq $network.gateway) {
+                    $obj | Add-Member -MemberType NoteProperty -Name "Gateway($($network.index[0]))"  -value ""
                 }
-                
+                else {
+                    $obj | Add-Member -MemberType NoteProperty -Name "Gateway($($network.index[0]))"  -value $($Network.gateway[0])
+                }
 
-                $obj.psobject.TypeNames.Insert(0,'OH.OHTools.ComputerInfo')
+                if ($NULL -eq $network.dhcp) {
+                    $obj | Add-Member -MemberType NoteProperty -Name "DHCPEnabled($($network.index[0]))"  -value "False"
+                }
+                else {
+                    $obj | Add-Member -MemberType NoteProperty -Name "DHCPEnabled($($network.index[0]))"  -value $($Network.dhcp[0])
+                }
 
-                write-output $obj
+                if ($NULL -eq $network.dns) {
+                    $obj | Add-Member -MemberType NoteProperty -Name "DNS($($network.index[0]))"  -value ""
+                }
+                else {
+                    $obj | Add-Member -MemberType NoteProperty -Name "DNS($($network.index[0]))"  -value (@($Network.dns) -join ',')
+                }
 
+                if ($NULL -eq $network.MAC) {
+                    $obj | Add-Member -MemberType NoteProperty -Name "MAC($($network.index[0]))"  -value ""
+                }
+                else {
+                    $obj | Add-Member -MemberType NoteProperty -Name "MAC($($network.index[0]))"  -value $($Network.MAC)
+                }
 
-            }#if $Continue
-        }#For Each $computer in $computername
-    }#process
+            }# foreach $network            
+            
+            $obj.psobject.TypeNames.Insert(0, 'OH.OHTools.OHComputerInfo')
+            $obj
 
-    end {}
+        }#foreach
+    }#proc
+
 }#function

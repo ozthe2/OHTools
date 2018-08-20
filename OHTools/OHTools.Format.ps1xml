@@ -2,9 +2,9 @@
 <Configuration>
     <ViewDefinitions>
         <View>
-            <Name>OH.OHTools.ComputerInfo</Name>
+            <Name>OH.OHTools.OHComputerInfo</Name>
             <ViewSelectedBy>
-                <TypeName>OH.OHTools.ComputerInfo</TypeName>
+                <TypeName>OH.OHTools.OHComputerInfo</TypeName>
             </ViewSelectedBy>
              <ListControl>
                 <ListEntries>
@@ -14,16 +14,19 @@
                                 <PropertyName>Computername</PropertyName>
                             </ListItem>
                             <ListItem>
-                                <PropertyName>OSVersion</PropertyName>
+                                <PropertyName>OS</PropertyName>
                             </ListItem>
                             <ListItem>
                                 <PropertyName>OSBuild</PropertyName>
                             </ListItem>
                             <ListItem>
-                                <PropertyName>SPVersion</PropertyName>
+                                <PropertyName>OSSPVersion</PropertyName>
                             </ListItem>
                             <ListItem>
                                 <PropertyName>OSArchitecture</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Manufacturer</PropertyName>
                             </ListItem>
                         </ListItems>
                     </ListEntry>
