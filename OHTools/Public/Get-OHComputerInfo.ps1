@@ -1,28 +1,6 @@
 ﻿Function Get-OHComputerInfo {
-    <#
-    .SYNOPSIS
-        Gets computer information such as Network details and Operating system installed
-    .DESCRIPTION
-        By default, this will pull basic but fundamental info from the computer such as OS, Network details eg IP \ Subnet etc, Virtual or not etc.
-        Use the -verbose switch to see which computers failed the connection test.
-    .PARAMETER ComputerName
-        The name of the computer that you wish to query.
-    .EXAMPLE
-        Get-OHComputerInfo -ComputerName MyComputer
-        The computer system information of 'MyComputer' will be displayed on screen.
-    .EXAMPLE
-        'computer1','computer2' | Get-OHComputerInfo
-        The computer information of 'Computer1' and 'Computer2' will be displayed on screen.
-    .EXAMPLE
-        (get-adcomputer -filter * -SearchBase 'ou=servers,ou=MyOU,dc=mydomain,dc=local').name  | Get-OHComputerInfo | export-csv C:\Output.csv -NoTypeInformation
-        The computer objects in the OU obtained by 'Get-ADComputer' will have all available computer information output to a CSV file.
-    .EXAMPLE
-        servers.txt | Get-OHComputerInfo
-        The computer names contained in Servers.txt will be used as the input of the command and all available computer information will be displayed.
-    .EXAMPLE
-        Get-OHComputerInfo | out-file  ('{0}{1}{2}' -f "C:\temp\Output-", (get-date -Format MMMyyy), ".log")
-        The local computer will be queried, and the result written to a dated file named 'Output-MonthYear.log'
-        #>
+   # .ExternalHelp OHTools-help.xml  
+
     [CmdletBinding()]
     param(
         [Parameter(

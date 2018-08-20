@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<helpItems schema="maml" xmlns="http://msh">
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+    <command:details>
+      <command:name>Get-OHComputerInfo</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>OHComputerInfo</command:noun>
+      <maml:description>
+        <maml:para>Gets computer information such as NIC, OS, Disks, processor details etc.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>By default, this will pull basic but fundamental info from the computer such as OS, OSBuild, OS Service Pack version, OS Architecture and Manufacturer.  (The Manufacturer will let you know if the computer is virtual or not) Use the -verbose switch to see which computers failed the connection test.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Get-OHComputerInfo</maml:name>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+          <maml:name>ComputerName</maml:name>
+          <maml:Description>
+            <maml:para>The name of the computer that you wish to query.</maml:para>
+          </maml:Description>
+          <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+          <dev:type>
+            <maml:name>String[]</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>$env:COMPUTERNAME</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName, ByValue)" position="1" aliases="none">
+        <maml:name>ComputerName</maml:name>
+        <maml:Description>
+          <maml:para>The name of the computer that you wish to query.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
+        <dev:type>
+          <maml:name>String[]</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>$env:COMPUTERNAME</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues />
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>https://www.fearthepanda.com
+Https://github.com/ozthe2</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
+        <dev:code>Get-OHComputerInfo
+
+ComputerName   : UKLGWLAP150
+OS             : Microsoft Windows 10 Enterprise
+OSBuild        : 16299
+OSSPVersion    : 0
+OSArchitecture : 64-bit
+Manufacturer   : Dell Inc.</dev:code>
+        <dev:remarks>
+          <maml:para>The computer system information of the local host will be displayed on screen.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
+        <dev:code>'computer1','computer2' | Get-OHComputerInfo</dev:code>
+        <dev:remarks>
+          <maml:para>The computer information of 'Computer1' and 'Computer2' will be displayed on screen.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 3 --------------------------</maml:title>
+        <dev:code>(get-adcomputer -filter * -SearchBase 'ou=servers,ou=MyOU,dc=mydomain,dc=local').name  | Get-OHComputerInfo | export-csv C:\Output.csv -NoTypeInformation</dev:code>
+        <dev:remarks>
+          <maml:para>The computer objects in the OU obtained by 'Get-ADComputer' will have all available computer information output to a CSV file.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 4 --------------------------</maml:title>
+        <dev:code>get-content c:\ohtemp\servers.txt | Get-OHComputerInfo</dev:code>
+        <dev:remarks>
+          <maml:para>The computer names contained in Servers.txt will be used as the input of the command.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 5 --------------------------</maml:title>
+        <dev:code>Get-OHComputerInfo | out-file  ('{0}{1}{2}' -f "C:\temp\Output-", (get-date -Format MMMyyy), ".log")</dev:code>
+        <dev:remarks>
+          <maml:para>The local computer will be queried, and the result written to a dated file named 'Output-MonthYear.log'</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+    <command:relatedLinks />
+  </command:command>
+</helpItems>
