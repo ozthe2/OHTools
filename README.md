@@ -1,6 +1,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/aonepjox78v7xhff?svg=true)](https://ci.appveyor.com/project/ozthe2/ohtools)
 
 ## OHTools
+A module that gets information from one or more computers such as disks, NIC's, IP, DNS info etc
 
 ### One time setup
     # Download the repository
@@ -18,7 +19,7 @@
 
 ### Get help
     Get-Help Get-OHComputerInfo -Full
-    Get-Help about_OHTools
+    Get-Help OHTools
 
 
 ### Examples

@@ -60,10 +60,12 @@
             }
             
             Foreach ($Disk in $DiskInfo) {
+                $size = ([math]::round(($disk.size/1GB),2))
+                $free = ([math]::round(($disk.freespace/1GB),2))
                 $obj | Add-Member -MemberType NoteProperty -Name "DriveLetter($($disk.DriveLetter))" -value $disk.DriveLetter    
                 $obj | Add-Member -MemberType NoteProperty -Name "VolumeName($($disk.DriveLetter))"  -value $disk.volumename
-                $obj | Add-Member -MemberType NoteProperty -Name "DiskSize($($disk.DriveLetter))"  -value $disk.Size
-                $obj | Add-Member -MemberType NoteProperty -Name "DiskFreespace($($disk.DriveLetter))"  -value $disk.freespace
+                $obj | Add-Member -MemberType NoteProperty -Name "DiskSize($($disk.DriveLetter))"  -value "$size GB"
+                $obj | Add-Member -MemberType NoteProperty -Name "DiskFreespace($($disk.DriveLetter))"  -value "$free GB"
             }
             
             foreach ($Network in $NICInfo) {
