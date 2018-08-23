@@ -1,9 +1,9 @@
 ﻿Function Get-OHComputerInfo {
    # .ExternalHelp OHTools-help.xml  
 
-    [CmdletBinding()]
+    [CmdletBinding(HelpURI='https://github.com/ozthe2/OHTools/blob/master/Docs/Get-OHComputerInfo.md')]
     param(
-        [Parameter(
+        [Parameter(	    
             ValueFromPipelineByPropertyName = $true,
             ValueFromPipeline = $true)]
         [string[]]$ComputerName = $env:COMPUTERNAME

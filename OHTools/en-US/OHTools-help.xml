@@ -48,7 +48,7 @@
     <maml:alertSet>
       <maml:alert>
         <maml:para>https://www.fearthepanda.com
-Https://github.com/ozthe2</maml:para>
+https://github.com/ozthe2</maml:para>
       </maml:alert>
     </maml:alertSet>
     <command:examples>
@@ -56,7 +56,7 @@ Https://github.com/ozthe2</maml:para>
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
         <dev:code>Get-OHComputerInfo
 
-ComputerName   : UKLGWLAP150
+ComputerName   : COMPUTER01
 OS             : Microsoft Windows 10 Enterprise
 OSBuild        : 16299
 OSSPVersion    : 0
@@ -91,10 +91,22 @@ Manufacturer   : Dell Inc.</dev:code>
         <maml:title>-------------------------- EXAMPLE 5 --------------------------</maml:title>
         <dev:code>Get-OHComputerInfo | out-file  ('{0}{1}{2}' -f "C:\temp\Output-", (get-date -Format MMMyyy), ".log")</dev:code>
         <dev:remarks>
-          <maml:para>The local computer will be queried, and the result written to a dated file named 'Output-MonthYear.log'</maml:para>
+          <maml:para>The local computer will be queried, and the result written to a dated file named 'Output-MonthYear.log' eg Output-July2018.log</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- EXAMPLE 6 --------------------------</maml:title>
+        <dev:code>Get-OHComputerInfo | Format-List *</dev:code>
+        <dev:remarks>
+          <maml:para>Display all available information from the local computer</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
-    <command:relatedLinks />
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Online Version:</maml:linkText>
+        <maml:uri></maml:uri>
+      </maml:navigationLink>
+    </command:relatedLinks>
   </command:command>
 </helpItems>
