@@ -1,7 +1,7 @@
 ---
 external help file: OHTools-help.xml
 Module Name: ohtools
-online version:
+online version: 1.4.1
 schema: 2.0.0
 ---
 
@@ -26,8 +26,9 @@ Use the -verbose switch to see which computers failed the connection test.
 ```powershell
 Get-OHComputerInfo
 ```
+
 ```
-ComputerName   : UKLGWLAP150
+ComputerName   : COMPUTER01
 OS             : Microsoft Windows 10 Enterprise
 OSBuild        : 16299
 OSSPVersion    : 0
@@ -63,7 +64,14 @@ The computer names contained in Servers.txt will be used as the input of the com
 Get-OHComputerInfo | out-file  ('{0}{1}{2}' -f "C:\temp\Output-", (get-date -Format MMMyyy), ".log")
 ```
 
-The local computer will be queried, and the result written to a dated file named 'Output-MonthYear.log'
+The local computer will be queried, and the result written to a dated file named 'Output-MonthYear.log' eg Output-July2018.log
+
+### EXAMPLE 6
+```powershell
+Get-OHComputerInfo | Format-List *
+```
+
+Display all available information from the local computer
 
 ## PARAMETERS
 
@@ -83,8 +91,7 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
@@ -92,7 +99,6 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 ## NOTES
 https://www.fearthepanda.com  
-Https://github.com/ozthe2
-
+https://github.com/ozthe2
 
 ## RELATED LINKS
